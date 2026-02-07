@@ -58,6 +58,7 @@ $router->dispatch(
 - `#[Inject]` — внедрение зависимости в конструктор.
 - `#[Response(ClassName::class, isArray: true)]` — тип ответа для OpenAPI.
 - `#[Tag('Имя', 'Описание')]` — группа в документации.
+- `#[NoAuth]` — пометка метода/контроллера, который не требует авторизации (используется middleware).
 
 Пример:
 ```php
@@ -83,6 +84,31 @@ final class UserController
 - `cache:build` — построить кеш маршрутов (через `RoutesCache`).
 - `cache:clear` — очистить кеш маршрутов.
 
+## Middleware
+Фреймворк поддерживает цепочку middleware для обработки запроса до контроллера.
+
+Пример подключения:
+```php
+$router = new Router($container, $debug, null, __DIR__);
+$router->addMiddleware(\App\Middleware\AuthMiddleware::class);
+```
+
+Middleware получает контекст:
+- `controller` — класс контроллера
+- `action` — метод контроллера
+- `uri`, `method`
+- `route`
+
+## Пример NoAuth
+```php
+use Sonata\Framework\Attributes\NoAuth;
+
+final class AuthController
+{
+    #[NoAuth]
+    public function login(): array { /* ... */ }
+}
+```
 ## Логика
 - **Роутинг**: `Router` сканирует контроллеры и строит маршруты по атрибутам. Поддерживаются параметры вида `/users/{id}`.
 - **DI**: `Container` автосвязывает зависимости по типам, `#[Inject]` позволяет указывать явные идентификаторы.

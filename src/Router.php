@@ -3,6 +3,7 @@ namespace Sonata\Framework;
 
 use Sonata\Framework\Attributes\From;
 use Sonata\Framework\Cache\RoutesCache;
+use Sonata\Framework\Middleware\MiddlewarePipeline;
 use Sonata\Framework\Routing\ControllerDirectoryResolver;
 
 class Router
@@ -12,6 +13,7 @@ class Router
     private bool $debug;
     private array $controllerDirectories;
     private string $basePath;
+    private array $middlewares = [];
 
     private \Sonata\Framework\Container\ContainerInterface $container;
 
@@ -50,6 +52,15 @@ class Router
         return $this->routes;
     }
 
+    public function addMiddleware(object|string|callable $middleware): void
+    {
+        $this->middlewares[] = $middleware;
+    }
+
+    public function setMiddlewares(array $middlewares): void
+    {
+        $this->middlewares = $middlewares;
+    }
 
 
     public function dispatch(string $uri, string $method): void
@@ -63,9 +74,25 @@ class Router
                     $controller = $this->container->get($route['controller']);
                     $methodName = $route['action'];
 
-                    // Передаём URL-параметры в resolveParameters
-                    $params = $this->resolveParameters($controller, $methodName, $matches);
-                    $response = call_user_func_array([$controller, $methodName], $params);
+                    $context = [
+                        'controller' => $route['controller'],
+                        'action' => $methodName,
+                        'uri' => $uri,
+                        'method' => $method,
+                        'route' => $route
+                    ];
+
+                    $handler = function (array $context) use ($controller, $methodName, $matches): mixed {
+                        $params = $this->resolveParameters($controller, $methodName, $matches);
+                        return call_user_func_array([$controller, $methodName], $params);
+                    };
+
+                    if (!empty($this->middlewares)) {
+                        $pipeline = new MiddlewarePipeline($this->container, $this->middlewares);
+                        $response = $pipeline->handle($context, $handler);
+                    } else {
+                        $response = $handler($context);
+                    }
 
                     $this->sendResponse($response);
                     return;

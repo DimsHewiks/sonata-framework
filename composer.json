@@ -6,7 +6,8 @@
     "php": "^8.3",
     "ext-json": "*",
     "ext-pdo": "*",
-    "symfony/validator": "^7.1"
+    "symfony/validator": "^7.1",
+    "ramsey/uuid": "^4.7"
   },
   "autoload": {
     "psr-4": {

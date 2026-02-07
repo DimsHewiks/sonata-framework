@@ -115,6 +115,21 @@ final class AuthController
 - **Валидация**: DTO наследуется от `ParamsDTO` и валидируется через `symfony/validator`.
 - **Кеш**: `RoutesCache` кеширует список маршрутов, `OpenApiCache` — OpenAPI-спеку.
 
+## MediaHelper
+Утилита для загрузки изображений, видео и документов из `$_FILES`.
+
+Пример:
+```php
+use Sonata\Framework\MediaHelper\MediaHelper;
+
+$media = new MediaHelper('/avatars');
+$media->setNames(['avatar']);
+$result = $media->import();
+```
+
+Настройки через env:
+- `MEDIA_UPLOAD_BASE` — базовая папка загрузки (по умолчанию `/upload-next`).
+
 ## Переменные окружения
 - `SONATA_BASE_PATH` — базовая директория приложения (для сканирования и кешей).
 - `APP_ENV` — режим (`dev`/`prod`), влияет на кеши.

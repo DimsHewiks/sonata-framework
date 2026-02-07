@@ -1,0 +1,27 @@
+{
+  "name": "sonata/framework",
+  "description": "Sonata PHP framework core",
+  "type": "library",
+  "require": {
+    "php": "^8.3",
+    "ext-json": "*",
+    "ext-pdo": "*",
+    "symfony/validator": "^7.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Sonata\\Framework\\": "src/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "1.0.x-dev"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
